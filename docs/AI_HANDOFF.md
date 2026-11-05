@@ -5,7 +5,7 @@
 - 브랜치: `main` (로컬 저장소, 원격 없음)
 
 ## 완료
-- `core/crawler/`: `sites.json`(3개 사이트·8개 게시판), `common.py`, `k2web.py`, `plus.py`, `cnu_api.py`, `collect.py`(CLI 포함)
+- `core/crawler/`: `sites.json`(3개 사이트·9개 게시판. 컴퓨터 교내 일반소식 notice.do는 2026-11-05 추가, 10건 수집 확인), `common.py`, `k2web.py`, `plus.py`, `cnu_api.py`, `collect.py`(CLI 포함)
 - `core/crawl_demo.ipynb`: 대상 확인 → HTML 수집 → 요약 표·샘플 JSON → API 수집(키 있을 때) → 비교
 - `core/web/index.html`: 사이트 탭, 게시판 필터, 검색, 고정 공지 우선·최신순, 본문 미리보기·첨부, `?method=api`, `#site` 해시
 - `core/tests/test_crawler.py`: 합성 HTML 기반 16개 테스트
@@ -32,11 +32,11 @@
 - 웹 데모는 `file://`로 열면 fetch가 막힌다. `core/`에서 http.server로 연다.
 
 ## 다음 작업 (우선순위)
-1. `CNU_KEY` 발급 후: `--list-api-boards`로 본부 게시판 번호를 찾아 sites.json `api_board_no`에 넣는다 → `--method api` → `--compare` 순으로 비교하고, 웹 `?method=api`로도 확인한다.
+1. `CNU_KEY` 발급 후: `--list-api-boards`로 본부 게시판과 컴퓨터 교내 일반소식의 번호를 찾아 sites.json `api_board_no`에 넣는다 → `--method api` → `--compare` 순으로 비교하고, 웹 `?method=api`로도 확인한다.
 2. 분류 단계: 카테고리(장학/취업/행사/학사/비교과), 대상 학과·학년, 마감일 추출(whalecrew2 `extension/extract.js` 참고). 결과가 생기면 웹 데모에 카테고리·D-day를 표시한다.
 3. Core FastAPI 골격(`POST /tools/campus-pick/crawl`) + Poetry로 옮긴다.
 4. BeautifulSoup 사용 여부를 싱크인사이트와 협의한다.
 
 ## Git
-- 커밋 2개: 수집기(`0a21100`), 웹 목록 데모(이 문서와 함께). 원격 저장소가 없어 push하지 않았다.
+- 커밋: 수집기(`0a21100`), 웹 목록 데모(`ee29fff`), 교내 일반소식 추가(이 문서와 함께). 원격 저장소가 없어 push하지 않았다.
 - 제외: `core/data/`(수집 결과)

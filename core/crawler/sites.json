@@ -18,7 +18,8 @@
     "respect_robots": true,
     "boards": [
       {"board": "bachelor", "name": "학사공지", "url": "https://computer.cnu.ac.kr/computer/notice/bachelor.do", "api_board_no": 305},
-      {"board": "job", "name": "취업정보", "url": "https://computer.cnu.ac.kr/computer/notice/job.do", "api_board_no": 307, "fetch_body": false, "note": "글 보기가 로그인 필요(2026-11-05 확인). 목록(제목·게시일·링크)만 수집"},
+      {"board": "notice", "name": "교내 일반소식", "url": "https://computer.cnu.ac.kr/computer/notice/notice.do", "api_board_no": null},
+      {"board": "job", "name": "교외 활동·인턴·취업", "url": "https://computer.cnu.ac.kr/computer/notice/job.do", "api_board_no": 307, "fetch_body": false, "note": "글 보기가 로그인 필요(2026-11-05 확인). 목록(제목·게시일·링크)만 수집"},
       {"board": "project", "name": "사업단소식", "url": "https://computer.cnu.ac.kr/computer/notice/project.do", "api_board_no": 324}
     ]
   },

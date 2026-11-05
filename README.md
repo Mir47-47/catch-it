@@ -26,7 +26,7 @@ docs/                     PROJECT_CONTEXT.md(장기 정보), AI_HANDOFF.md(진�
 | site | 사이트 | 게시판 | 방식 |
 |---|---|---|---|
 | `cnu` | 충남대 본부 plus.cnu.ac.kr | 새소식, 학사정보, 장학게시판 | HTML (API 번호 미확인) |
-| `computer` | 컴퓨터인공지능학부 computer.cnu.ac.kr | 학사공지, 취업정보(목록만, 본문은 로그인 필요), 사업단소식 | HTML / API 305·307·324 |
+| `computer` | 컴퓨터인공지능학부 computer.cnu.ac.kr | 학사공지, 교내 일반소식, 교외 활동·인턴·취업(목록만, 본문은 로그인 필요), 사업단소식 | HTML / API 305·307·324 (교내 일반소식 번호 미확인) |
 | `biz` | 경영학부 biz.cnu.ac.kr | 학부 공지사항, 취업정보 | HTML / API 3792 |
 
 > **robots.txt 주의:** plus.cnu.ac.kr은 robots.txt로 일반 크롤러를 전부 막는다(`Disallow: /`).

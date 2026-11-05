@@ -22,7 +22,9 @@
 
 ## 확인된 사이트 사실 (2026-11-05)
 - 인재개발원 job.cnu.ac.kr 게시판은 로그인이 필요하다(302 → login.do). 수집 대상에서 뺐다.
-- computer.cnu.ac.kr 취업정보(job.do)는 목록은 공개지만 글 보기는 로그인이 필요하다. 그래서 `fetch_body: false`로 둔다.
+- computer.cnu.ac.kr 공지 메뉴는 학사공지(bachelor.do), 교내 일반소식(notice.do), 교외 활동·인턴·취업(job.do, 페이지 제목은 "취업정보"), 사업단소식(project.do)으로 되어 있다. 우리학부 News(cse.do)는 수상 소식 위주라 수집하지 않는다.
+- job.do는 목록은 공개지만 글 보기는 로그인이 필요하다. 그래서 `fetch_body: false`로 둔다.
+- whalecrew2 매핑에는 notice.do가 없다. 다른 학과를 추가할 때도 참고 매핑만 믿지 말고 실제 메뉴를 확인할 것.
 - 본문이 이미지나 PDF 뷰어(iframe)뿐인 글이 꽤 많다. 그런 글은 `content: ""`이므로 분류할 때 제목과 첨부 이름을 함께 써야 한다.
 - 공식 API 응답에는 고정 공지 여부, 첨부 이름, 작성일이 없고 수정일(`update_dt`)만 있다.
 
