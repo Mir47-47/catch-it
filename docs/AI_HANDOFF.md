@@ -39,5 +39,7 @@
 
 ## Git
 - 원격: `origin` = git@github.com:Mir47-47/catch-it.git (공개 저장소)
-- 작업 브랜치: `crawlar`. 로컬 `main`의 커밋에서 docx를 이력 전체에서 뺀 복사본이다(사용자 요청: docx·pdf 업로드 금지). 로컬 `main`은 수행계획서 docx가 첫 커밋에 들어 있어 그대로 push하면 안 된다.
-- 제외: `core/data/`(수집 결과), `*.docx`, `*.pdf`
+- `main`: 프로젝트 개요 README + `.gitignore` 한 커밋만 있다.
+- `crawlar`: `main` 위에 수집기·웹 데모 작업 커밋이 쌓여 있다. PR로 `main`에 병합할 수 있다.
+- 2026-11-05에 브랜치를 재구성했다(사용자 요청). docx·pdf·CLAUDE.md·AGENTS.md는 모든 커밋에서 뺐다. 재구성 전 이력은 로컬 `backup/main-old`, `backup/crawlar-old`에만 있다. 이 백업에는 docx가 들어 있으므로 절대 push하지 말 것.
+- 제외(.gitignore): `core/data/`(수집 결과), `*.docx`, `*.pdf`, `CLAUDE.md`, `AGENTS.md`(로컬 전용 AI 지침)
