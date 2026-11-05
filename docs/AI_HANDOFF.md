@@ -38,7 +38,9 @@
 4. BeautifulSoup 사용 여부를 싱크인사이트와 협의한다.
 
 ## Git
-- 원격: `origin` = git@github.com:Mir47-47/catch-it.git (공개 저장소)
+- 원격: `origin` = https://Mir47-47@github.com/Mir47-47/catch-it.git (공개 저장소). `main`·`crawlar`를 push했고 추적 중이다.
+  - 인증은 Windows Git Credential Manager에 저장된 Mir47-47 계정을 쓴다.
+  - SSH(`git@github.com:...`)는 이 PC 키가 GitHub에 등록되지 않아 실패한다. gh CLI 로그인 계정(JI2NU)은 이 저장소에 쓰기 권한이 없다.
 - `main`: 프로젝트 개요 README + `.gitignore` 한 커밋만 있다.
 - `crawlar`: `main` 위에 수집기·웹 데모 작업 커밋이 쌓여 있다. PR로 `main`에 병합할 수 있다.
 - 2026-11-05에 브랜치를 재구성했다(사용자 요청). docx·pdf·CLAUDE.md·AGENTS.md는 모든 커밋에서 뺐다. 재구성 전 이력은 로컬 `backup/main-old`, `backup/crawlar-old`에만 있다. 이 백업에는 docx가 들어 있으므로 절대 push하지 말 것.
