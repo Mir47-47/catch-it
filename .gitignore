@@ -1,0 +1,17 @@
+# 수집 결과(재생성 가능, 게시글 원문 포함)는 커밋하지 않는다
+core/data/
+
+# 문서 원본(수행계획서 등)은 저장소에 올리지 않는다
+*.docx
+*.pdf
+
+# AI 작업 지침 파일은 로컬 전용
+CLAUDE.md
+AGENTS.md
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+.env
