@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT
 
 ## 목적
-캠퍼스 픽(가칭): 충남대 교내 공지·장학·취업 정보를 수집·분류해 학생 관심사(학과·학년·카테고리·키워드) 일치도 순으로 보여주는 싱크인사이트 위젯 도구. 기획 원본: `수행계획서_교내정보큐레이션.docx`.
+캠퍼스 픽(가칭): 충남대 교내 공지·장학·취업 정보를 수집·분류해 학생 관심사(학과·학년·카테고리·키워드) 일치도 순으로 보여주는 싱크인사이트 위젯 도구. 기획 원본은 `수행계획서_교내정보큐레이션.docx`다. docx·pdf는 저장소에 올리지 않으므로(.gitignore) 팀 공유 경로로 받는다.
 
 ## 구조 (계획서 기준 3축)
 - Frontend(React) → Backend(Spring Boot, `/api/tools/campus-pick/...`) → Core(FastAPI, `/tools/campus-pick/crawl`, `/recommend`)

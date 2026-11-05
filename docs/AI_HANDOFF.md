@@ -38,5 +38,6 @@
 4. BeautifulSoup 사용 여부를 싱크인사이트와 협의한다.
 
 ## Git
-- 커밋: 수집기(`0a21100`), 웹 목록 데모(`ee29fff`), 교내 일반소식 추가(이 문서와 함께). 원격 저장소가 없어 push하지 않았다.
-- 제외: `core/data/`(수집 결과)
+- 원격: `origin` = git@github.com:Mir47-47/catch-it.git (공개 저장소)
+- 작업 브랜치: `crawlar`. 로컬 `main`의 커밋에서 docx를 이력 전체에서 뺀 복사본이다(사용자 요청: docx·pdf 업로드 금지). 로컬 `main`은 수행계획서 docx가 첫 커밋에 들어 있어 그대로 push하면 안 된다.
+- 제외: `core/data/`(수집 결과), `*.docx`, `*.pdf`
