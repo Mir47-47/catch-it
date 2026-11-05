@@ -1,0 +1,6 @@
+# 수집기 데모(노트북) 실행용. Core FastAPI 구성 시 Poetry(pyproject.toml)로 옮긴다.
+httpx>=0.27
+beautifulsoup4>=4.12   # 계획서 미결 사항 4: 싱크인사이트 팀과 사전 협의 필요
+pandas>=2.0            # 노트북 표 출력용
+jupyter
+pytest>=7

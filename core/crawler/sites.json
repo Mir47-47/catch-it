@@ -1,0 +1,35 @@
+[
+  {
+    "site": "cnu",
+    "name": "충남대학교(본부)",
+    "parser": "plus",
+    "respect_robots": false,
+    "note": "plus.cnu.ac.kr robots.txt는 일반 크롤러 Disallow: /. 팀 결정(2026-11-05): 공식 API(CNU_KEY) 발급 전까지만 HTML로 저빈도 수집하고, 발급 후 API 결과와 비교한다.",
+    "boards": [
+      {"board": "news", "name": "새소식", "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701", "api_board_no": null},
+      {"board": "academic", "name": "학사정보", "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0702&site_dvs_cd=kr&menu_dvs_cd=0702", "api_board_no": null},
+      {"board": "scholarship", "name": "장학게시판", "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713", "api_board_no": null}
+    ]
+  },
+  {
+    "site": "computer",
+    "name": "컴퓨터인공지능학부",
+    "parser": "k2web",
+    "respect_robots": true,
+    "boards": [
+      {"board": "bachelor", "name": "학사공지", "url": "https://computer.cnu.ac.kr/computer/notice/bachelor.do", "api_board_no": 305},
+      {"board": "job", "name": "취업정보", "url": "https://computer.cnu.ac.kr/computer/notice/job.do", "api_board_no": 307, "fetch_body": false, "note": "글 보기가 로그인 필요(2026-11-05 확인). 목록(제목·게시일·링크)만 수집"},
+      {"board": "project", "name": "사업단소식", "url": "https://computer.cnu.ac.kr/computer/notice/project.do", "api_board_no": 324}
+    ]
+  },
+  {
+    "site": "biz",
+    "name": "경영학부",
+    "parser": "k2web",
+    "respect_robots": true,
+    "boards": [
+      {"board": "notice", "name": "학부 공지사항", "url": "https://biz.cnu.ac.kr/biz/community/notice.do", "api_board_no": 3792},
+      {"board": "employment", "name": "취업정보", "url": "https://biz.cnu.ac.kr/biz/community/employment.do", "api_board_no": null}
+    ]
+  }
+]
