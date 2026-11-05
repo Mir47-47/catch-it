@@ -3,7 +3,7 @@
 흩어진 충남대 공지·장학·취업 정보를 모아 학생 관심사에 맞게 보여주는 싱크인사이트 위젯 도구(실무 프로젝트 랩 10조).
 기획은 `수행계획서_교내정보큐레이션.docx` 참고.
 
-**현재 단계: Core 수집기 데모.** 충남대 본부, 컴퓨터인공지능학부, 경영학부 게시판을 크롤링해 JSON으로 저장한다.
+**현재 단계: 수집기와 웹 목록 데모.** 충남대 본부, 컴퓨터인공지능학부, 경영학부 게시판을 크롤링해 JSON으로 저장한다(DB가 생기기 전까지 JSON 파일이 저장소 역할을 한다). 웹 화면에서는 홈페이지별 공지를 목록으로 보여준다.
 
 ## 구조
 ```
@@ -17,7 +17,8 @@ core/                     Core(Python) 축
     collect.py            수집 실행·저장·리포트·HTML/API 비교 + CLI
   tests/                  단위 테스트(네트워크 없음)
   crawl_demo.ipynb        데모 노트북
-  data/                   수집 결과 (git 제외)
+  web/index.html          웹 목록 데모 (정적 페이지, data/*.json을 읽음)
+  data/                   수집 결과 JSON (git 제외)
 docs/                     PROJECT_CONTEXT.md(장기 정보), AI_HANDOFF.md(진행 상황)
 ```
 
@@ -41,6 +42,18 @@ jupyter notebook crawl_demo.ipynb                 # 데모 노트북
 python -m crawler.collect --method html --limit 10  # CLI: HTML 수집
 python -m pytest -q tests                          # 테스트
 ```
+
+### 웹 목록 데모
+```bash
+cd core
+python -m crawler.collect --limit 10              # 1) 수집 → data/html/*.json
+python -m http.server 8000 --bind 127.0.0.1       # 2) 정적 서버 (Python 기본 내장)
+# 3) 브라우저에서 http://127.0.0.1:8000/web/
+```
+- 탭으로 충남대학교(본부)·컴퓨터인공지능학부·경영학부를 고르고, 게시판 필터와 제목·본문 검색을 쓸 수 있다. 상단 고정 공지가 먼저 나오고 나머지는 최신순이다.
+- 항목마다 게시판·고정 여부·게시일·첨부 수가 보이고, 본문 미리보기를 펼칠 수 있다. 원문 링크는 새 탭에서 연다(`rel="noopener noreferrer"`, 학교 도메인만).
+- `http://127.0.0.1:8000/web/?method=api`로 열면 공식 API 수집 결과를 본다. `#biz`처럼 해시를 붙이면 해당 탭이 바로 열린다.
+- 브라우저 보안 정책 때문에 `index.html`을 파일로 직접 열면 JSON을 읽지 못한다. 반드시 서버로 연다.
 공식 API(키 발급 후, 키는 환경변수로만 넣는다):
 ```powershell
 $env:CNU_KEY = "<발급키>"

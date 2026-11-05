@@ -6,7 +6,9 @@
 ## 구조 (계획서 기준 3축)
 - Frontend(React) → Backend(Spring Boot, `/api/tools/campus-pick/...`) → Core(FastAPI, `/tools/campus-pick/crawl`, `/recommend`)
 - 파이프라인: 크롤링 → 키워드 규칙 분류·대상·마감일 추출 → 추천 점수 → 피드. 벡터화·LLM 분류 없음(피드백 반영해 단순화).
-- 현재 구현은 Core 수집기(`core/crawler/`)와 데모 노트북뿐이다. FastAPI·Backend·Frontend는 아직 없다.
+- 현재 구현은 Core 수집기(`core/crawler/`), 데모 노트북, 웹 목록 데모(`core/web/index.html`)다. FastAPI·Backend·Frontend는 아직 없다.
+- **DB가 없는 동안에는 `core/data/{html|api}/{site}.json`이 저장소다.** 웹 데모는 정적 페이지가 이 JSON과 `crawler/sites.json`(탭·게시판 목록)을 직접 fetch한다. 서버는 `python -m http.server`이고 의존성은 없다. 계획서의 React 위젯과 Backend API가 생기면 대체되는 임시 화면이라 빌드 도구나 프레임워크를 쓰지 않았다.
+- 웹 데모는 데이터를 신뢰하지 않는다. 텍스트는 `textContent`로만 넣고, 링크는 `*.cnu.ac.kr`만 새 탭(`noopener noreferrer`)으로 연다.
 
 ## 수집기 설계 결정
 - **사이트 설정은 `core/crawler/sites.json`에 둔다.** 계획서 3.5에 따라 수집 대상 URL은 코드에 고정하지 않으며, `CAMPUS_PICK_SITES_FILE`로 교체할 수 있다. `parser` 값(`k2web`|`plus`)으로 파서를 고른다.

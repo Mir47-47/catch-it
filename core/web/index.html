@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>캠퍼스 픽 공지 모아보기</title>
+<!--
+  수집 결과 JSON(core/data/{method}/{site}.json)을 홈페이지별 공지 목록으로 보여주는 데모.
+  DB가 생기기 전까지 JSON 파일이 저장소 역할을 한다. 실행: core/에서
+    python -m http.server 8000 --bind 127.0.0.1   →  http://127.0.0.1:8000/web/
+  ?method=api 를 붙이면 공식 API 수집 결과를 본다.
+-->
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #677085; --line: #e3e6ec;
+    --accent: #1b5fd1; --accent-soft: #e8f0fd; --pin: #b4530a; --pin-soft: #fdf0e3; --warn: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b; --card: #1b1f27; --text: #e6e8ee; --muted: #9aa2b4; --line: #2c323d;
+      --accent: #7aa7f5; --accent-soft: #1f2d47; --pin: #f0a868; --pin-soft: #3a2a1a; --warn: #f97066;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.55 "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .tabs { display: flex; gap: 6px; margin: 20px 0 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .tab { border: 0; background: none; color: var(--muted); font: inherit; padding: 10px 14px; cursor: pointer;
+         border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+  .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab .n { font-size: 12px; margin-left: 4px; opacity: .8; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 6px; }
+  .chip { border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 13px;
+          padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .search { flex: 1 1 200px; min-width: 0; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px;
+            background: var(--card); color: var(--text); font: inherit; }
+  .meta { color: var(--muted); font-size: 12px; margin: 4px 0 12px; }
+  .meta .bad { color: var(--warn); }
+  ul.list { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  ul.list li { padding: 12px 16px; border-top: 1px solid var(--line); }
+  ul.list li:first-child { border-top: 0; }
+  .title { display: flex; gap: 8px; align-items: baseline; }
+  .title a { min-width: 0; color: var(--text); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; }
+  @media (max-width: 560px) { .title { flex-wrap: wrap; } .title a { flex-basis: 100%; } }
+  .title a:hover { color: var(--accent); text-decoration: underline; }
+  .badge { flex: none; font-size: 11px; padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+  .badge.pin { background: var(--pin-soft); color: var(--pin); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 3px; }
+  details { margin-top: 6px; font-size: 13px; }
+  details summary { cursor: pointer; color: var(--muted); }
+  details .body { white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; padding: 10px 12px; background: var(--bg); border-radius: 6px;
+                  max-height: 260px; overflow: auto; }
+  details .files a { color: var(--accent); }
+  .empty { padding: 32px 16px; text-align: center; color: var(--muted); }
+  .error { padding: 16px; border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; background: var(--card); }
+  code { background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>캠퍼스 픽 · 교내 공지 모아보기</h1>
+    <p id="desc">충남대 본부·학과 홈페이지 공지를 수집한 JSON으로 보여주는 데모</p>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <div class="bar">
+    <div id="boards" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <input class="search" id="q" type="search" placeholder="제목·본문 검색" aria-label="검색">
+  </div>
+  <div class="meta" id="meta"></div>
+  <main id="out"></main>
+</div>
+
+<script>
+const METHOD = new URLSearchParams(location.search).get("method") === "api" ? "api" : "html";
+const PREVIEW = 600; // 본문 미리보기 글자 수
+const state = { sites: [], data: {}, site: null, board: "", q: "" };
+const $ = (id) => document.getElementById(id);
+
+// 데이터는 신뢰하지 않는다: 텍스트는 textContent로만 넣고, 링크는 학교 도메인만 연다
+function el(tag, props = {}, ...kids) {
+  const e = document.createElement(tag);
+  Object.assign(e, props);
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+function schoolUrl(u) {
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) && /(^|\.)cnu\.ac\.kr$/.test(x.hostname) ? x.href : null; }
+  catch { return null; }
+}
+function link(url, text) {
+  const href = schoolUrl(url);
+  return href ? el("a", { href, target: "_blank", rel: "noopener noreferrer", textContent: text }) : el("span", { textContent: text });
+}
+const fmtTime = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "-";
+
+async function getJson(path) {
+  const r = await fetch(path, { cache: "no-store" });
+  if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
+  return r.json();
+}
+
+async function load() {
+  $("desc").textContent += ` (수집 방식: ${METHOD === "api" ? "공식 API" : "HTML 크롤링"})`;
+  try {
+    state.sites = await getJson("../crawler/sites.json");
+  } catch (e) {
+    return showError("사이트 설정을 읽지 못했습니다. core/ 폴더에서 서버를 실행했는지 확인하세요.", e);
+  }
+  await Promise.all(state.sites.map(async (s) => {
+    try { state.data[s.site] = await getJson(`../data/${METHOD}/${s.site}.json`); }
+    catch (e) { state.data[s.site] = null; }
+  }));
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  state.site = state.sites.some((s) => s.site === fromHash) ? fromHash : state.sites[0].site;
+  renderTabs();
+  render();
+}
+
+function showError(msg, e) {
+  $("out").replaceChildren(el("div", { className: "error", textContent: `${msg} (${e.message})` }));
+}
+
+function renderTabs() {
+  $("tabs").replaceChildren(...state.sites.map((s) => {
+    const d = state.data[s.site];
+    const b = el("button", { className: "tab", role: "tab", textContent: s.name },
+                 el("span", { className: "n", textContent: d ? d.posts.length : "-" }));
+    b.setAttribute("aria-selected", s.site === state.site);
+    b.onclick = () => { state.site = s.site; state.board = ""; location.hash = s.site; renderTabs(); render(); };
+    return b;
+  }));
+  // 좁은 화면에서 선택한 탭이 가려지지 않게
+  $("tabs").querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function render() {
+  const site = state.sites.find((s) => s.site === state.site);
+  const d = state.data[site.site];
+
+  // 게시판 필터
+  const chip = (value, label) => {
+    const c = el("button", { className: "chip", textContent: label });
+    c.setAttribute("aria-pressed", state.board === value);
+    c.onclick = () => { state.board = value; render(); };
+    return c;
+  };
+  $("boards").replaceChildren(chip("", "전체"), ...site.boards.map((b) => chip(b.board, b.name)));
+
+  if (!d) {
+    $("meta").replaceChildren();
+    $("out").replaceChildren(el("div", { className: "empty" },
+      "아직 수집 결과가 없습니다. core/ 폴더에서 ",
+      el("code", { textContent: `python -m crawler.collect --method ${METHOD}` }), " 를 먼저 실행하세요."));
+    return;
+  }
+
+  $("meta").replaceChildren(
+    `마지막 수집 ${fmtTime(d.updated)} · `,
+    d.ok ? "정상" : el("span", { className: "bad", textContent: "일부 게시판 수집 실패(지난 수집분 표시)" }),
+    site.respect_robots === false ? " · robots.txt 비허용 사이트(API 발급 전 임시 수집)" : "");
+
+  const q = state.q.trim().toLowerCase();
+  const boardName = Object.fromEntries(site.boards.map((b) => [b.board, b.name]));
+  const posts = d.posts
+    .filter((p) => !state.board || p.board === state.board || (p.also_in || []).includes(state.board))
+    .filter((p) => !q || (p.title + "\n" + (p.content || "")).toLowerCase().includes(q))
+    // 상단 고정 공지 먼저, 그다음 최신 게시일 순
+    .sort((a, b) => (b.pinned === true) - (a.pinned === true) || (b.posted_at || "").localeCompare(a.posted_at || ""));
+
+  if (!posts.length) {
+    $("out").replaceChildren(el("div", { className: "empty", textContent: "조건에 맞는 공지가 없습니다." }));
+    return;
+  }
+  $("out").replaceChildren(el("ul", { className: "list" }, ...posts.map((p) => item(p, boardName))));
+}
+
+function item(p, boardName) {
+  const files = p.attachments || [];
+  const notes = [p.posted_at || "날짜 없음"];
+  if (files.length) notes.push(`첨부 ${files.length}`);
+  else if (p.attach_count) notes.push(`첨부 ${p.attach_count}`);
+  if (p.also_in) notes.push(`같은 글: ${p.also_in.map((b) => boardName[b] || b).join(", ")}`);
+
+  let detail = null;
+  if (p.content === null) {
+    notes.push("본문 미수집(로그인 필요 등)");
+  } else if (!p.content && !files.length) {
+    notes.push("본문 없음(이미지·PDF)");
+  } else {
+    const text = p.content || "본문이 이미지·PDF뿐입니다. 원문이나 첨부를 확인하세요.";
+    detail = el("details", {},
+      el("summary", { textContent: "본문 미리보기" }),
+      el("div", { className: "body", textContent: text.length > PREVIEW ? text.slice(0, PREVIEW) + " …" : text }),
+      files.length ? el("div", { className: "files" }, "첨부: ",
+        ...files.flatMap((f, i) => [i ? " · " : "", link(f.url, f.name)])) : null);
+  }
+
+  return el("li", {},
+    el("div", { className: "title" },
+      el("span", { className: "badge", textContent: boardName[p.board] || p.board }),
+      p.pinned ? el("span", { className: "badge pin", textContent: "고정" }) : null,
+      link(p.url, p.title)),
+    el("div", { className: "sub", textContent: notes.join(" · ") }),
+    detail);
+}
+
+$("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+load();
+</script>
+</body>
+</html>
